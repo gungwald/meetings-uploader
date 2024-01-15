@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="com-microsoft-outlook">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/com-microsoft-outlook.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

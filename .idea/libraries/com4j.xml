@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="com4j">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/com4j.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/javadoc.zip!/javadoc" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/com4j-src.zip!/" />
+    </SOURCES>
+  </library>
+</component>
