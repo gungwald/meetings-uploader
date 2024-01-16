@@ -113,8 +113,10 @@ public class MeetingsUploader {
             json.append(startDateTime);
             json.append("\",\"subject\":\"");
             json.append(subject);
-            json.append("\"},\n");
+            json.append("\"},\r\n");
         }
+        json.setLength(json.length() - 3); // Remove trailing comma
+        json.append("]}");
         return json.toString();
     }
 
