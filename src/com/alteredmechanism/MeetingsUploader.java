@@ -1,6 +1,8 @@
 package com.alteredmechanism;
 
 import com.microsoft.outlook.*;
+import com4j.Com4jObject;
+import com4j.ComException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -46,7 +48,7 @@ public class MeetingsUploader {
         ArrayList<_AppointmentItem> meetings = new ArrayList<>();
         Date now = new Date();
 
-        _AppointmentItem meeting = allMeetings.getFirst().queryInterface(_AppointmentItem.class);
+        _AppointmentItem meeting = getFirst(allMeetings);
 
         while (meeting != null) {
             if (! meeting.getAllDayEvent() && ! isOptional(meeting)) {
@@ -58,10 +60,32 @@ public class MeetingsUploader {
                     }
                 }
             }
-            meeting = allMeetings.getNext().queryInterface(_AppointmentItem.class);
+            meeting = getNext(allMeetings);
         }
         String json = convertToJson(meetings);
         sendViaHttpPut(json, uploadAddress);
+    }
+
+    protected _AppointmentItem getFirst(_Items items) {
+        _AppointmentItem meeting;
+        Com4jObject item = items.getFirst();
+        if (item != null) {
+            meeting = item.queryInterface(_AppointmentItem.class);
+        } else {
+            meeting = null;
+        }
+        return meeting;
+    }
+
+    protected _AppointmentItem getNext(_Items items) {
+        _AppointmentItem meeting;
+        Com4jObject item = items.getNext();
+        if (item != null) {
+            meeting = item.queryInterface(_AppointmentItem.class);
+        } else {
+            meeting = null;
+        }
+        return meeting;
     }
 
     protected void sendViaHttpPut(String json, URI sendToAddress) throws IOException, InterruptedException {
@@ -162,9 +186,9 @@ public class MeetingsUploader {
 
         try {
             occurrence = recPattern.getOccurrence(targetDateTime);
-        } catch (com4j.ComException e) {
+        } catch (ComException e) {
             if (e.getHRESULT() != NO_RECURRENCE_ERR_NUM && e.getHRESULT() != 0) {
-                logger.log(Level.SEVERE, String.format("HRESULT={%d}", e.getHRESULT()), e);
+                logger.log(Level.SEVERE, String.format("Failed to get recurrence: VBA/VBS Err.Number a.k.a. C++ HRESULT = %d: %s", e.getHRESULT(), targetDateTime.toString()), e);
             }
         }
         return occurrence;
