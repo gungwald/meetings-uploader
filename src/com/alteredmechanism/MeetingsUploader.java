@@ -1,9 +1,9 @@
 package com.alteredmechanism;
 
 import com.microsoft.outlook.*;
+import com4j.ErrorInfo;
 
 import java.io.IOException;
-import java.lang.Exception;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -80,7 +80,12 @@ public class MeetingsUploader {
         StringBuilder json = new StringBuilder("{\"meetings\":[\r\n");
         for (_AppointmentItem meeting : meetings) {
             String startDateTime = dateTimeFmt.format(meeting.getStart());
-            String subject = encodeJsonValue(meeting.getConversationTopic());
+            String subject;
+            if (meeting.getConversationTopic() != null) {
+                subject = encodeJsonValue(meeting.getConversationTopic());
+            } else {
+                subject = "";
+            }
             json.append("{\"dateTime\":\"");
             json.append(startDateTime);
             json.append("\",\"subject\":\"");
@@ -157,7 +162,15 @@ public class MeetingsUploader {
 
         try {
             occurrence = recPattern.getOccurrence(targetDateTime);
-        } catch (Exception e) {
+        } catch (com4j.ComException e) {
+
+            ErrorInfo err = e.getErrorInfo();
+            if (err != null) {
+                logger.warning(err.toString());
+            }
+            logger.log(Level.WARNING, "HRESULT={}", e.getHRESULT());
+            logger.log(Level.WARNING, e.getDetailMessage());
+            logger.warning(e.toString());
             e.printStackTrace();
         }
         return occurrence;
