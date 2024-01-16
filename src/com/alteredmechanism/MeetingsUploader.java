@@ -1,7 +1,6 @@
 package com.alteredmechanism;
 
 import com.microsoft.outlook.*;
-import com4j.ErrorInfo;
 
 import java.io.IOException;
 import java.net.URI;
@@ -163,15 +162,7 @@ public class MeetingsUploader {
         try {
             occurrence = recPattern.getOccurrence(targetDateTime);
         } catch (com4j.ComException e) {
-
-            ErrorInfo err = e.getErrorInfo();
-            if (err != null) {
-                logger.warning(err.toString());
-            }
-            logger.log(Level.WARNING, "HRESULT={}", e.getHRESULT());
-            logger.log(Level.WARNING, e.getDetailMessage());
-            logger.warning(e.toString());
-            e.printStackTrace();
+            logger.log(Level.WARNING, String.format("HRESULT={%d}", e.getHRESULT()), e);
         }
         return occurrence;
     }
