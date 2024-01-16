@@ -118,7 +118,7 @@ public class MeetingsUploader {
     }
 
     protected boolean isOptional(_AppointmentItem meeting) {
-        return meeting.getConversationTopic().toLowerCase().contains("(optional)");
+        return meeting.getConversationTopic() != null && meeting.getConversationTopic().toLowerCase().contains("(optional)");
     }
 
     protected ArrayList<_AppointmentItem> resolveRecurrences(Date beginningWithDate, _AppointmentItem meeting, int dayCount) {
@@ -158,11 +158,14 @@ public class MeetingsUploader {
 
     protected _AppointmentItem resolveRecurrence(Date targetDateTime, RecurrencePattern recPattern) {
         _AppointmentItem occurrence = null;
+        final int NO_RECURRENCE_ERR_NUM = -2147467259;
 
         try {
             occurrence = recPattern.getOccurrence(targetDateTime);
         } catch (com4j.ComException e) {
-            logger.log(Level.WARNING, String.format("HRESULT={%d}", e.getHRESULT()), e);
+            if (e.getHRESULT() != NO_RECURRENCE_ERR_NUM && e.getHRESULT() != 0) {
+                logger.log(Level.SEVERE, String.format("HRESULT={%d}", e.getHRESULT()), e);
+            }
         }
         return occurrence;
     }
