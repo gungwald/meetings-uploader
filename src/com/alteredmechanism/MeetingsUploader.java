@@ -27,9 +27,13 @@ public class MeetingsUploader {
 
     public static void main(String[] args) {
         try {
-            SEND_TO_ADDRESS = new URI("http://www.nct.jvmhost.net/meetings-proxy/meetings");
-            MeetingsUploader mu = new MeetingsUploader();
-            mu.upload(SEND_TO_ADDRESS);
+            if (args.length > 0) {
+                SEND_TO_ADDRESS = new URI(args[0]);
+                MeetingsUploader mu = new MeetingsUploader();
+                mu.upload(SEND_TO_ADDRESS);
+            } else {
+                System.err.println("You stupid");
+            }
         } catch (Throwable t) {
             logger.log(Level.SEVERE, "Failed to upload meetings", t);
         }
@@ -40,9 +44,10 @@ public class MeetingsUploader {
         _NameSpace ns = lookout.getNamespace("MAPI");
         MAPIFolder calendar = ns.getDefaultFolder(olFolderCalendar);
         _Items allMeetings = calendar.getItems();
-        _AppointmentItem meeting = (_AppointmentItem) allMeetings.getFirst();
         ArrayList<_AppointmentItem> meetings = new ArrayList<>();
         Date now = new Date();
+
+        _AppointmentItem meeting = allMeetings.getFirst().queryInterface(_AppointmentItem.class);
 
         while (meeting != null) {
             if (! meeting.getAllDayEvent() && ! isOptional(meeting)) {
@@ -54,7 +59,7 @@ public class MeetingsUploader {
                     }
                 }
             }
-            meeting = (_AppointmentItem) allMeetings.getNext();
+            meeting = allMeetings.getNext().queryInterface(_AppointmentItem.class);
         }
         String json = convertToJson(meetings);
         sendViaHttpPut(json, uploadAddress);
